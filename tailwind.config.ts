@@ -32,6 +32,14 @@ export default {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
@@ -51,6 +59,16 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				fintech: {
+					bg: 'hsl(var(--fintech-bg))',
+					card: 'hsl(var(--fintech-card))',
+					border: 'hsl(var(--fintech-border))',
+					accent: 'hsl(var(--fintech-accent))',
+					success: 'hsl(var(--fintech-success))',
+					warning: 'hsl(var(--fintech-warning))',
+					text: 'hsl(var(--fintech-text))',
+					muted: 'hsl(var(--fintech-muted))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
