@@ -182,9 +182,16 @@ export default function Dashboard() {
                 Welcome back, {profile?.first_name}
               </p>
             </div>
-            <Button variant="outline" onClick={signOut}>
-              Sign Out
-            </Button>
+            <div className="flex items-center space-x-4">
+              {profile?.is_admin && (
+                <Button variant="outline" onClick={() => window.location.href = '/admin'}>
+                  Admin Panel
+                </Button>
+              )}
+              <Button variant="outline" onClick={signOut}>
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
