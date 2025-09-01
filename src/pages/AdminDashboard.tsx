@@ -173,10 +173,15 @@ export default function AdminDashboard() {
 
   const updateUserStatus = async (userId: string, status: 'approved' | 'declined' | 'deactivated') => {
     try {
-      const { error } = await supabase
+      console.log('Attempting to update user:', userId, 'to status:', status);
+      
+      const { data, error } = await supabase
         .from('profiles')
         .update({ status })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .select();
+
+      console.log('Update result:', { data, error });
 
       if (error) throw error;
 
@@ -187,6 +192,7 @@ export default function AdminDashboard() {
 
       fetchUsers();
     } catch (error: any) {
+      console.error('Update error:', error);
       toast({
         title: "Error",
         description: error.message,
