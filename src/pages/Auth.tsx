@@ -402,17 +402,6 @@ export default function Auth() {
             </Tabs>
           </CardHeader>
         </Card>
-        
-        {/* Admin Portal Link */}
-        <div className="text-center">
-          <Link 
-            to="/admin" 
-            className="text-sm text-fintech-muted hover:text-fintech-text transition-colors inline-flex items-center space-x-1"
-          >
-            <Shield className="w-3 h-3" />
-            <span>Admin Portal</span>
-          </Link>
-        </div>
       </div>
     </div>
   );
