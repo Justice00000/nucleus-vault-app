@@ -9,7 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { 
   DollarSign, 
   ArrowUpRight, 
-  ArrowDownLeft, 
+  ArrowDownLeft,
+  ArrowRightLeft, 
   Clock, 
   Eye, 
   EyeOff, 
@@ -35,6 +36,8 @@ interface Transaction {
   status: 'pending' | 'approved' | 'declined' | 'delayed';
   description: string;
   created_at: string;
+  external_account_number?: string;
+  external_account_name?: string;
 }
 
 export default function Dashboard() {
@@ -241,7 +244,7 @@ export default function Dashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Deposits</CardTitle>
@@ -268,6 +271,22 @@ export default function Dashboard() {
                       {formatCurrency(
                         transactions
                           .filter(t => t.type === 'withdrawal' && t.status === 'approved')
+                          .reduce((sum, t) => sum + Number(t.amount), 0)
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Transfers</CardTitle>
+                    <ArrowRightLeft className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-primary">
+                      {formatCurrency(
+                        transactions
+                          .filter(t => t.type === 'transfer' && t.status === 'approved')
                           .reduce((sum, t) => sum + Number(t.amount), 0)
                       )}
                     </div>
@@ -304,19 +323,28 @@ export default function Dashboard() {
                           <div className="flex items-center space-x-3">
                             {transaction.type === 'deposit' ? (
                               <ArrowDownLeft className="w-5 h-5 text-success" />
-                            ) : (
+                            ) : transaction.type === 'withdrawal' ? (
                               <ArrowUpRight className="w-5 h-5 text-destructive" />
+                            ) : (
+                              <ArrowRightLeft className="w-5 h-5 text-primary" />
                             )}
                             <div>
                               <p className="font-medium capitalize">{transaction.type}</p>
                               <p className="text-sm text-muted-foreground">
-                                {formatDate(transaction.created_at)}
+                                {transaction.type === 'transfer' 
+                                  ? `To: ${transaction.external_account_number}`
+                                  : formatDate(transaction.created_at)
+                                }
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className={`font-medium ${
-                              transaction.type === 'deposit' ? 'text-success' : 'text-destructive'
+                              transaction.type === 'deposit' 
+                                ? 'text-success' 
+                                : transaction.type === 'withdrawal'
+                                ? 'text-destructive'
+                                : 'text-primary'
                             }`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatCurrency(Number(transaction.amount))}
                             </p>
@@ -352,15 +380,22 @@ export default function Dashboard() {
                               <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
                                 <ArrowDownLeft className="w-5 h-5 text-success" />
                               </div>
-                            ) : (
+                            ) : transaction.type === 'withdrawal' ? (
                               <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
                                 <ArrowUpRight className="w-5 h-5 text-destructive" />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <ArrowRightLeft className="w-5 h-5 text-primary" />
                               </div>
                             )}
                             <div>
                               <p className="font-medium capitalize">{transaction.type}</p>
                               <p className="text-sm text-muted-foreground">
-                                {transaction.description || 'No description'}
+                                {transaction.type === 'transfer' 
+                                  ? `To Account: ${transaction.external_account_number}`
+                                  : transaction.description || 'No description'
+                                }
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {formatDate(transaction.created_at)}
@@ -369,7 +404,11 @@ export default function Dashboard() {
                           </div>
                           <div className="text-right">
                             <p className={`font-medium ${
-                              transaction.type === 'deposit' ? 'text-success' : 'text-destructive'
+                              transaction.type === 'deposit' 
+                                ? 'text-success' 
+                                : transaction.type === 'withdrawal'
+                                ? 'text-destructive'
+                                : 'text-primary'
                             }`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatCurrency(Number(transaction.amount))}
                             </p>
