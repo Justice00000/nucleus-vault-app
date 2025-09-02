@@ -290,6 +290,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_admin_status: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       generate_account_number: {
         Args: Record<PropertyKey, never>
         Returns: string
