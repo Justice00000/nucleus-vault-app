@@ -188,6 +188,9 @@ export default function Dashboard() {
                   Admin Panel
                 </Button>
               )}
+              <Button variant="outline" onClick={() => window.location.href = '/settings'}>
+                Settings
+              </Button>
               <Button variant="outline" onClick={signOut}>
                 Sign Out
               </Button>
@@ -232,7 +235,7 @@ export default function Dashboard() {
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="transfer">Transfer</TabsTrigger>
+              <TabsTrigger value="transfer">Money</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
             </TabsList>
 
