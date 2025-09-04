@@ -236,7 +236,7 @@ export function KYCUpload() {
       </Card>
 
       {/* Document Upload Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {DOCUMENT_TYPES.map((docType) => {
           const Icon = docType.icon;
           const status = getDocumentStatus(docType.id);
@@ -335,7 +335,7 @@ export function KYCUpload() {
         <CardContent className="pt-6">
           <div className="space-y-4">
             <h4 className="font-medium">Document Guidelines</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
               <div className="space-y-2">
                 <h5 className="font-medium text-foreground">Photo Quality</h5>
                 <ul className="space-y-1 list-disc list-inside">

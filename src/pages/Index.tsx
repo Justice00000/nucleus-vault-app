@@ -67,17 +67,17 @@ const Index = () => {
       <nav className="bg-white border-b border-fintech-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
-              <h1 className="text-2xl font-bold text-fintech-text">FinTech Pro</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">FinTech Pro</h1>
             </div>
-            <div className="space-x-4">
-              <Button variant="ghost" asChild>
+            <div className="flex space-x-2 sm:space-x-4">
+              <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
                 <a href="/auth">Sign In</a>
               </Button>
-              <Button asChild>
+              <Button size="sm" className="text-xs sm:text-sm" asChild>
                 <a href="/auth">Get Started</a>
               </Button>
             </div>
@@ -90,7 +90,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
             <div className="space-y-4">
-              <h2 className="text-5xl lg:text-6xl font-bold text-fintech-text">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-fintech-text">
                 Banking Made
                 <span className="text-primary block">Simple & Secure</span>
               </h2>
@@ -102,18 +102,18 @@ const Index = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex justify-center items-center space-x-8 text-fintech-muted">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-fintech-muted">
               <div className="flex items-center space-x-2">
-                <Shield className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium">FDIC Insured</span>
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="text-xs sm:text-sm font-medium">FDIC Insured</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium">500K+ Users</span>
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="text-xs sm:text-sm font-medium">500K+ Users</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium">A+ Security Rating</span>
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="text-xs sm:text-sm font-medium">A+ Security Rating</span>
               </div>
             </div>
 

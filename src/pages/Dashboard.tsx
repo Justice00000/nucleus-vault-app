@@ -178,26 +178,28 @@ export default function Dashboard() {
       {/* Header */}
       <header className="bg-white border-b border-fintech-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-3 sm:gap-0">
             <div>
-              <h1 className="text-2xl font-bold text-fintech-text">FinTech Pro</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">FinTech Pro</h1>
               <p className="text-sm text-fintech-muted">
                 Welcome back, {profile?.first_name}
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               {profile?.is_admin && (
-                <Button variant="outline" onClick={() => window.location.href = '/admin'}>
-                  Admin Panel
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin'}>
+                  <span className="hidden sm:inline">Admin Panel</span>
+                  <span className="sm:hidden">Admin</span>
                 </Button>
               )}
-              <Button variant="outline" onClick={() => window.location.href = '/settings'}>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/settings'}>
                 Settings
               </Button>
-              <Button variant="outline" onClick={signOut}>
-                Sign Out
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden">Out</span>
               </Button>
-            </div>
+            </div>  
           </div>
         </div>
       </header>
@@ -235,16 +237,16 @@ export default function Dashboard() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="transfer">Money</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+              <TabsTrigger value="transactions" className="text-xs sm:text-sm">Transactions</TabsTrigger>
+              <TabsTrigger value="transfer" className="text-xs sm:text-sm">Money</TabsTrigger>
+              <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Deposits</CardTitle>

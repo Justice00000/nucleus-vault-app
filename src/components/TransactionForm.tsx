@@ -161,39 +161,39 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
       {/* Transaction Type Selection */}
       <Card>
         <CardHeader>
           <CardTitle>Select Transaction Type</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button
               type="button"
               variant={transactionType === 'deposit' ? 'default' : 'outline'}
               onClick={() => setTransactionType('deposit')}
-              className="h-20 flex-col space-y-2"
+              className="h-16 sm:h-20 flex-col space-y-1 sm:space-y-2"
             >
-              <ArrowDownLeft className="w-6 h-6" />
+              <ArrowDownLeft className="w-4 h-4 sm:w-6 sm:h-6" />
               <span className="text-xs">Deposit</span>
             </Button>
             <Button
               type="button"
               variant={transactionType === 'withdrawal' ? 'default' : 'outline'}
               onClick={() => setTransactionType('withdrawal')}
-              className="h-20 flex-col space-y-2"
+              className="h-16 sm:h-20 flex-col space-y-1 sm:space-y-2"
             >
-              <ArrowUpRight className="w-6 h-6" />
+              <ArrowUpRight className="w-4 h-4 sm:w-6 sm:h-6" />
               <span className="text-xs">Withdrawal</span>
             </Button>
             <Button
               type="button"
               variant={transactionType === 'transfer' ? 'default' : 'outline'}
               onClick={() => setTransactionType('transfer')}
-              className="h-20 flex-col space-y-2"
+              className="h-16 sm:h-20 flex-col space-y-1 sm:space-y-2"
             >
-              <ArrowRightLeft className="w-6 h-6" />
+              <ArrowRightLeft className="w-4 h-4 sm:w-6 sm:h-6" />
               <span className="text-xs">Transfer</span>
             </Button>
           </div>

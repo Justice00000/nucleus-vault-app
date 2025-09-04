@@ -126,8 +126,8 @@ export default function Settings() {
       {/* Header */}
       <header className="bg-white border-b border-fintech-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-3 sm:gap-0">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Button
                 variant="ghost"
                 size="sm"
@@ -138,13 +138,13 @@ export default function Settings() {
                 <span>Back</span>
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-fintech-text">Settings</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">Settings</h1>
                 <p className="text-sm text-fintech-muted">
                   Manage your account and preferences
                 </p>
               </div>
             </div>
-            <Button variant="outline" onClick={signOut}>
+            <Button variant="outline" size="sm" onClick={signOut}>
               Sign Out
             </Button>
           </div>
@@ -153,10 +153,10 @@ export default function Settings() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
+            <TabsTrigger value="account" className="text-xs sm:text-sm">Account</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
@@ -170,7 +170,7 @@ export default function Settings() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
@@ -233,7 +233,7 @@ export default function Settings() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <Label className="text-sm font-medium">Account Number</Label>
                     <div className="flex items-center space-x-2 mt-1">
@@ -261,7 +261,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <Label className="text-sm font-medium">Account Status</Label>
                     <div className="mt-1">

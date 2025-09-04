@@ -393,19 +393,21 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="bg-white border-b border-fintech-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-3 sm:gap-0">
             <div>
-              <h1 className="text-2xl font-bold text-fintech-text">Admin Dashboard</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">Admin Dashboard</h1>
               <p className="text-sm text-fintech-muted">
                 Manage users, transactions, and KYC documents
               </p>
             </div>
-            <div className="flex space-x-4">
-              <Button variant="outline" onClick={() => window.location.href = '/dashboard'}>
-                User View
+            <div className="flex gap-2 sm:gap-4">
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard'}>
+                <span className="hidden sm:inline">User View</span>
+                <span className="sm:hidden">User</span>
               </Button>
-              <Button variant="outline" onClick={signOut}>
-                Sign Out
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden">Out</span>
               </Button>
             </div>
           </div>
@@ -414,7 +416,7 @@ export default function AdminDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -472,11 +474,11 @@ export default function AdminDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="kyc">KYC Documents</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
+            <TabsTrigger value="transactions" className="text-xs sm:text-sm">Transactions</TabsTrigger>
+            <TabsTrigger value="kyc" className="text-xs sm:text-sm">KYC Docs</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
