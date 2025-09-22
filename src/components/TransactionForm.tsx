@@ -16,7 +16,7 @@ interface TransactionFormProps {
 export function TransactionForm({ onSuccess }: TransactionFormProps) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [transactionType, setTransactionType] = useState<'deposit' | 'withdrawal' | 'transfer'>('deposit');
+  const [transactionType, setTransactionType] = useState<'deposit' | 'transfer'>('deposit');
   
   const [formData, setFormData] = useState({
     amount: '',
@@ -62,8 +62,8 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
 
       if (accountError) throw accountError;
 
-      // Check if user has sufficient balance for withdrawal or transfer
-      if ((transactionType === 'withdrawal' || transactionType === 'transfer') && account.balance < amount) {
+      // Check if user has sufficient balance for transfer
+      if (transactionType === 'transfer' && account.balance < amount) {
         toast({
           title: "Insufficient Balance",
           description: "You don't have enough balance for this transaction",
@@ -134,7 +134,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
       const actionText = transactionType === 'transfer' ? 'transfer' : `${transactionType} request`;
       toast({
         title: "Request Submitted",
-        description: `Your ${actionText} has been submitted${transactionType === 'transfer' ? ' and will be processed immediately' : ' and is pending approval'}.`
+        description: `Your ${actionText} has been submitted and is pending approval.`
       });
 
       // Reset form
@@ -168,7 +168,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
           <CardTitle>Select Transaction Type</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               type="button"
               variant={transactionType === 'deposit' ? 'default' : 'outline'}
@@ -177,15 +177,6 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
             >
               <ArrowDownLeft className="w-4 h-4 sm:w-6 sm:h-6" />
               <span className="text-xs">Deposit</span>
-            </Button>
-            <Button
-              type="button"
-              variant={transactionType === 'withdrawal' ? 'default' : 'outline'}
-              onClick={() => setTransactionType('withdrawal')}
-              className="h-16 sm:h-20 flex-col space-y-1 sm:space-y-2"
-            >
-              <ArrowUpRight className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span className="text-xs">Withdrawal</span>
             </Button>
             <Button
               type="button"
@@ -201,13 +192,11 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
           <div className="p-4 bg-muted rounded-lg">
             <h4 className="font-medium text-sm mb-2">
               {transactionType === 'deposit' && 'Deposit Funds'}
-              {transactionType === 'withdrawal' && 'Withdraw Funds'}
               {transactionType === 'transfer' && 'Transfer to User'}
             </h4>
             <p className="text-sm text-muted-foreground">
               {transactionType === 'deposit' && 'Transfer money from your external bank account to your FinTech Pro account.'}
-              {transactionType === 'withdrawal' && 'Transfer money from your FinTech Pro account to your external bank account.'}
-              {transactionType === 'transfer' && 'Transfer money to another FinTech Pro user instantly using their account number.'}
+              {transactionType === 'transfer' && 'Transfer money to another FinTech Pro user using their account number.'}
             </p>
           </div>
         </CardContent>
@@ -220,7 +209,6 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
             <DollarSign className="w-5 h-5" />
             <span>
               {transactionType === 'deposit' && 'Deposit Request'}
-              {transactionType === 'withdrawal' && 'Withdrawal Request'}
               {transactionType === 'transfer' && 'Transfer Money'}
             </span>
           </CardTitle>
@@ -330,7 +318,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
                 ? 'Submitting...' 
                 : transactionType === 'transfer' 
                   ? 'Transfer Money'
-                  : `Submit ${transactionType === 'deposit' ? 'Deposit' : 'Withdrawal'} Request`
+                  : 'Submit Deposit Request'
               }
             </Button>
 
@@ -338,8 +326,8 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
               <p className="text-xs text-muted-foreground">
                 <strong>Important:</strong> 
                 {transactionType === 'transfer' 
-                  ? ' Transfers between FinTech Pro users are processed instantly once submitted.'
-                  : ' All deposit and withdrawal requests are reviewed by our team for security purposes. You will receive an email notification once your request is processed (typically within 1-2 business days).'
+                  ? ' Transfer requests are reviewed by our team for security purposes. You will receive an email notification once your transfer is processed (typically within 1-2 business days).'
+                  : ' All deposit requests are reviewed by our team for security purposes. You will receive an email notification once your request is processed (typically within 1-2 business days).'
                 }
               </p>
             </div>

@@ -310,7 +310,7 @@ export default function Dashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Deposits</CardTitle>
@@ -321,22 +321,6 @@ export default function Dashboard() {
                       {formatCurrency(
                         transactions
                           .filter(t => t.type === 'deposit' && t.status === 'approved')
-                          .reduce((sum, t) => sum + Number(t.amount), 0)
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Withdrawals</CardTitle>
-                    <ArrowUpRight className="h-4 w-4 text-destructive" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-destructive">
-                      {formatCurrency(
-                        transactions
-                          .filter(t => t.type === 'withdrawal' && t.status === 'approved')
                           .reduce((sum, t) => sum + Number(t.amount), 0)
                       )}
                     </div>
@@ -380,7 +364,7 @@ export default function Dashboard() {
                 <CardContent>
                   {transactions.length === 0 ? (
                     <p className="text-center text-muted-foreground py-8">
-                      No transactions yet. Start by making a deposit or withdrawal.
+                      No transactions yet. Start by making a deposit or transfer.
                     </p>
                   ) : (
                     <div className="space-y-4">
@@ -389,8 +373,6 @@ export default function Dashboard() {
                           <div className="flex items-center space-x-3">
                             {transaction.type === 'deposit' ? (
                               <ArrowDownLeft className="w-5 h-5 text-success" />
-                            ) : transaction.type === 'withdrawal' ? (
-                              <ArrowUpRight className="w-5 h-5 text-destructive" />
                             ) : (
                               <ArrowRightLeft className="w-5 h-5 text-primary" />
                             )}
@@ -408,8 +390,6 @@ export default function Dashboard() {
                             <p className={`font-medium ${
                               transaction.type === 'deposit' 
                                 ? 'text-success' 
-                                : transaction.type === 'withdrawal'
-                                ? 'text-destructive'
                                 : 'text-primary'
                             }`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatCurrency(Number(transaction.amount))}
@@ -446,10 +426,6 @@ export default function Dashboard() {
                               <div className="w-10 h-10 bg-success/10 rounded-full flex items-center justify-center">
                                 <ArrowDownLeft className="w-5 h-5 text-success" />
                               </div>
-                            ) : transaction.type === 'withdrawal' ? (
-                              <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
-                                <ArrowUpRight className="w-5 h-5 text-destructive" />
-                              </div>
                             ) : (
                               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                                 <ArrowRightLeft className="w-5 h-5 text-primary" />
@@ -472,8 +448,6 @@ export default function Dashboard() {
                             <p className={`font-medium ${
                               transaction.type === 'deposit' 
                                 ? 'text-success' 
-                                : transaction.type === 'withdrawal'
-                                ? 'text-destructive'
                                 : 'text-primary'
                             }`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatCurrency(Number(transaction.amount))}
