@@ -294,7 +294,7 @@ export default function Dashboard() {
               </div>
               <div className="space-y-1">
                 <p className="text-primary-foreground/80 text-sm">Account Number</p>
-                <p className="font-mono text-sm">•••• •••• •••• {account?.account_number?.slice(-4)}</p>
+                <p className="font-mono text-sm">{account?.account_number}</p>
               </div>
             </CardContent>
           </Card>
@@ -492,7 +492,10 @@ export default function Dashboard() {
 
             {/* Transfer Tab */}
             <TabsContent value="transfer" className="space-y-6">
-              <TransactionForm onSuccess={fetchTransactions} />
+              <TransactionForm onSuccess={() => {
+                fetchAccount();
+                fetchTransactions();
+              }} />
             </TabsContent>
 
             {/* Documents Tab */}
