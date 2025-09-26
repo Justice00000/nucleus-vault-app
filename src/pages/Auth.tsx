@@ -105,7 +105,7 @@ export default function Auth() {
             <Building2 className="w-8 h-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-fintech-text">FinTech Pro</h1>
+            <h1 className="text-3xl font-bold text-fintech-text">Community Reserve</h1>
             <p className="text-fintech-muted mt-2">Secure Digital Banking Platform</p>
           </div>
           

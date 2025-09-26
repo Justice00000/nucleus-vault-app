@@ -71,7 +71,7 @@ const Index = () => {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">FinTech Pro</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">Community Reserve</h1>
             </div>
             <div className="flex space-x-2 sm:space-x-4">
               <Button variant="ghost" size="sm" className="hidden sm:flex" asChild>
@@ -95,7 +95,7 @@ const Index = () => {
                 <span className="text-primary block">Simple & Secure</span>
               </h2>
               <p className="text-xl text-fintech-muted max-w-3xl mx-auto">
-                Experience the future of digital banking with FinTech Pro. 
+                Experience the future of digital banking with Community Reserve. 
                 Manage your money effortlessly with our cutting-edge platform 
                 designed for the modern financial lifestyle.
               </p>
@@ -142,7 +142,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl lg:text-4xl font-bold text-fintech-text mb-4">
-              Why Choose FinTech Pro?
+              Why Choose Community Reserve?
             </h3>
             <p className="text-lg text-fintech-muted max-w-2xl mx-auto">
               We're not just another bank. We're your financial partner, 
@@ -246,7 +246,7 @@ const Index = () => {
             Ready to Take Control of Your Finances?
           </h3>
           <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join hundreds of thousands of users who trust FinTech Pro 
+            Join hundreds of thousands of users who trust Community Reserve 
             with their financial future. Open your account today and 
             experience banking the way it should be.
           </p>
@@ -277,10 +277,10 @@ const Index = () => {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-fintech-text">FinTech Pro</span>
+              <span className="text-xl font-bold text-fintech-text">Community Reserve</span>
             </div>
             <p className="text-fintech-muted text-sm">
-              © 2024 FinTech Pro. All rights reserved. 
+              © 2024 Community Reserve. All rights reserved. 
               Member FDIC. Equal Housing Lender.
             </p>
           </div>

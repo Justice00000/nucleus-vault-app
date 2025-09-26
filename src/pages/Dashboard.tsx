@@ -185,7 +185,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">FinTech Pro</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">Community Reserve</h1>
               {!isHeaderCollapsed && (
                 <p className="text-sm text-fintech-muted">
                   Welcome back, {profile?.first_name}

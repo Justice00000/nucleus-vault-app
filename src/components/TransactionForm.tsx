@@ -195,8 +195,8 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
               {transactionType === 'transfer' && 'Transfer to User'}
             </h4>
             <p className="text-sm text-muted-foreground">
-              {transactionType === 'deposit' && 'Transfer money from your external bank account to your FinTech Pro account.'}
-              {transactionType === 'transfer' && 'Transfer money to another FinTech Pro user using their account number.'}
+              {transactionType === 'deposit' && 'Transfer money from your external bank account to your Community Reserve account.'}
+              {transactionType === 'transfer' && 'Transfer money to another Community Reserve user using their account number.'}
             </p>
           </div>
         </CardContent>
@@ -260,7 +260,7 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter the account number of another FinTech Pro user
+                    Enter the account number of another Community Reserve user
                   </p>
                 </div>
               </div>
