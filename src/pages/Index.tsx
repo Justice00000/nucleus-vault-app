@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { 
-  Building2, 
+  Landmark, 
   Shield, 
   Users, 
   Smartphone, 
@@ -69,7 +69,7 @@ const Index = () => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center">
-                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+                <Landmark className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-fintech-text">Community Reserve</h1>
             </div>
@@ -275,7 +275,7 @@ const Index = () => {
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-primary-foreground" />
+                <Landmark className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-fintech-text">Community Reserve</span>
             </div>

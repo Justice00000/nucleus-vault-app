@@ -14,7 +14,7 @@ import {
   Clock, 
   Eye, 
   EyeOff, 
-  CreditCard,
+  Banknote,
   FileText,
   Bell,
   Upload,
@@ -290,7 +290,7 @@ export default function Dashboard() {
                     </Button>
                   </div>
                 </div>
-                <CreditCard className="w-8 h-8 text-primary-foreground/80" />
+                <Banknote className="w-8 h-8 text-primary-foreground/80" />
               </div>
               <div className="space-y-1">
                 <p className="text-primary-foreground/80 text-sm">Account Number</p>
