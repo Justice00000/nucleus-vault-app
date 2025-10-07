@@ -241,10 +241,35 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      // Send email notification
+      // Send detailed email notification
       const transaction = transactions.find(t => t.id === transactionId);
       if (transaction?.profiles?.email) {
         try {
+          // Get account details
+          const { data: accountData } = await supabase
+            .from('accounts')
+            .select('account_number')
+            .eq('user_id', transaction.user_id)
+            .single();
+
+          // Send transaction notification email
+          await supabase.functions.invoke('send-transaction-notification', {
+            body: {
+              user_email: transaction.profiles.email,
+              user_name: `${transaction.profiles.first_name} ${transaction.profiles.last_name}`,
+              transaction_type: transaction.type,
+              amount: Number(transaction.amount),
+              status,
+              description: transaction.description || notes,
+              account_number: accountData?.account_number,
+              external_account: transaction.external_account_number 
+                ? `${transaction.external_account_name || ''} (${transaction.external_account_number})`
+                : undefined,
+              transaction_id: transactionId,
+            }
+          });
+
+          // Also send in-app notification
           await supabase.functions.invoke('send-admin-notification', {
             body: {
               user_email: transaction.profiles.email,

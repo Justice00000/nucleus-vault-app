@@ -17,14 +17,12 @@ import {
   Banknote,
   FileText,
   Bell,
-  Upload,
   Menu,
   X,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { TransactionForm } from '@/components/TransactionForm';
-import { KYCUpload } from '@/components/KYCUpload';
 
 interface Account {
   id: string;
@@ -62,6 +60,11 @@ export default function Dashboard() {
   // Redirect to auth if not logged in
   if (!user && !isLoading) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect to KYC if not approved
+  if (profile?.kyc_status !== 'approved') {
+    return <Navigate to="/kyc" replace />;
   }
 
   // Show pending approval message
@@ -301,11 +304,10 @@ export default function Dashboard() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
               <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
               <TabsTrigger value="transactions" className="text-xs sm:text-sm">Transactions</TabsTrigger>
               <TabsTrigger value="transfer" className="text-xs sm:text-sm">Money</TabsTrigger>
-              <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -470,11 +472,6 @@ export default function Dashboard() {
                 fetchAccount();
                 fetchTransactions();
               }} />
-            </TabsContent>
-
-            {/* Documents Tab */}
-            <TabsContent value="documents" className="space-y-6">
-              <KYCUpload />
             </TabsContent>
           </Tabs>
         </div>

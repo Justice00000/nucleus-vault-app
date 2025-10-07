@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       toast({
         title: "Registration Successful",
-        description: "Please check your email to verify your account."
+        description: "Please complete your KYC verification to access your account."
       });
     }
     

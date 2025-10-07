@@ -125,16 +125,54 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
         });
       }
 
-      const { error } = await supabase
+      const { data: transactionResult, error } = await supabase
         .from('transactions')
-        .insert([transactionData]);
+        .insert([transactionData])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Send email notification for transaction submission
+      try {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('email, first_name, last_name')
+          .eq('user_id', user.id)
+          .single();
+
+        const { data: accountData } = await supabase
+          .from('accounts')
+          .select('account_number')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileData) {
+          await supabase.functions.invoke('send-transaction-notification', {
+            body: {
+              user_email: profileData.email,
+              user_name: `${profileData.first_name} ${profileData.last_name}`,
+              transaction_type: transactionType,
+              amount: amount,
+              status: 'pending',
+              description: formData.description,
+              account_number: accountData?.account_number,
+              external_account: transactionType === 'transfer' 
+                ? formData.recipientAccountNumber
+                : `${formData.externalAccountName} (${formData.externalAccountNumber})`,
+              transaction_id: transactionResult.id,
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send transaction email:', emailError);
+        // Don't fail the transaction if email fails
+      }
 
       const actionText = transactionType === 'transfer' ? 'transfer' : `${transactionType} request`;
       toast({
         title: "Request Submitted",
-        description: `Your ${actionText} has been submitted and is pending approval.`
+        description: `Your ${actionText} has been submitted and is pending approval. You'll receive an email confirmation.`
       });
 
       // Reset form

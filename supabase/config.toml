@@ -2,3 +2,9 @@ project_id = "gfwmshlstziijmqkblws"
 
 [functions.send-notifications]
 verify_jwt = false
+
+[functions.send-admin-notification]
+verify_jwt = false
+
+[functions.send-transaction-notification]
+verify_jwt = false
