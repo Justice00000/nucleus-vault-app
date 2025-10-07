@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +52,11 @@ export function KYCUpload() {
   const [documents, setDocuments] = useState<any[]>([]);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
+  // Fetch documents on mount
+  useEffect(() => {
+    fetchDocuments();
+  }, [user]);
+
   const handleFileUpload = async (documentType: string, file: File) => {
     if (!user) return;
 
@@ -100,6 +105,36 @@ export function KYCUpload() {
         }]);
 
       if (dbError) throw dbError;
+
+      // Update profile KYC status to pending if this is first document
+      const { data: existingDocs } = await supabase
+        .from('kyc_documents')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (existingDocs && existingDocs.length === 1) {
+        // This is the first document, update profile status and send email
+        await supabase
+          .from('profiles')
+          .update({ kyc_status: 'pending' })
+          .eq('user_id', user.id);
+
+        // Send KYC submission email notification
+        if (profile?.email) {
+          try {
+            await supabase.functions.invoke('send-kyc-notification', {
+              body: {
+                user_email: profile.email,
+                user_name: `${profile.first_name} ${profile.last_name}`,
+                status: 'submitted',
+                message: 'We have received your KYC documents and our team will review them within 24 hours. You will receive an email notification once the review is complete.'
+              }
+            });
+          } catch (emailError) {
+            console.error('Failed to send email notification:', emailError);
+          }
+        }
+      }
 
       toast({
         title: "Document Uploaded",

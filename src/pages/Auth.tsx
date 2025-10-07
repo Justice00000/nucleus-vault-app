@@ -45,7 +45,7 @@ export default function Auth() {
 
   // Redirect if already logged in
   if (user && !isLoading) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/kyc" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {

@@ -331,10 +331,56 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      // Send email notification
       const kycDoc = kycDocuments.find(d => d.id === docId);
+      
+      // Check if all required documents are approved
+      if (status === 'approved' && kycDoc) {
+        const { data: userDocs } = await supabase
+          .from('kyc_documents')
+          .select('status, document_type')
+          .eq('user_id', kycDoc.user_id);
+
+        // Check if user has at least one approved government ID (drivers_license or passport)
+        const hasApprovedID = userDocs?.some(doc => 
+          (doc.document_type === 'drivers_license' || doc.document_type === 'passport') && 
+          doc.status === 'approved'
+        );
+
+        // If this approval completes KYC, update profile status
+        if (hasApprovedID) {
+          await supabase
+            .from('profiles')
+            .update({ kyc_status: 'approved' })
+            .eq('user_id', kycDoc.user_id);
+        }
+      }
+
+      // If rejecting and this is a required document, update profile status
+      if (status === 'rejected' && kycDoc) {
+        if (kycDoc.document_type === 'drivers_license' || kycDoc.document_type === 'passport') {
+          await supabase
+            .from('profiles')
+            .update({ kyc_status: 'rejected' })
+            .eq('user_id', kycDoc.user_id);
+        }
+      }
+
+      // Send email notification using the new KYC notification function
       if (kycDoc?.profiles?.email) {
         try {
+          await supabase.functions.invoke('send-kyc-notification', {
+            body: {
+              user_email: kycDoc.profiles.email,
+              user_name: `${kycDoc.profiles.first_name} ${kycDoc.profiles.last_name}`,
+              status: status === 'approved' ? 'approved' : 'rejected',
+              message: status === 'approved' 
+                ? 'Congratulations! Your account is now fully activated and you can access all banking features.'
+                : undefined,
+              rejection_reason: status === 'rejected' && notes ? notes : 'Please ensure your documents are clear, valid, and match your account information.'
+            }
+          });
+
+          // Also send in-app notification
           await supabase.functions.invoke('send-admin-notification', {
             body: {
               user_email: kycDoc.profiles.email,

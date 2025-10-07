@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.send-transaction-notification]
 verify_jwt = false
+
+[functions.send-kyc-notification]
+verify_jwt = false

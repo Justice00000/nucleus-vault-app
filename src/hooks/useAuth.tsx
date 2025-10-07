@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/kyc`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -102,11 +102,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Registration Failed",
         description: error.message,
         variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "Registration Successful",
-        description: "Please complete your KYC verification to access your account."
       });
     }
     
