@@ -17,32 +17,39 @@ import {
 
 const DOCUMENT_TYPES = [
   {
-    id: 'drivers_license',
-    name: 'Driver\'s License',
-    description: 'Upload a clear photo of your driver\'s license (front and back)',
+    id: 'drivers_license_front',
+    name: 'Driver\'s License (Front)',
+    description: 'Clear photo of the front of your driver\'s license',
     icon: CreditCard,
     required: true
   },
   {
-    id: 'passport',
-    name: 'Passport',
-    description: 'Upload a clear photo of your passport (photo page)',
-    icon: FileText,
-    required: false
+    id: 'drivers_license_back',
+    name: 'Driver\'s License (Back)',
+    description: 'Clear photo of the back of your driver\'s license',
+    icon: CreditCard,
+    required: true
   },
   {
-    id: 'utility_bill',
-    name: 'Utility Bill',
-    description: 'Recent utility bill (gas, electric, water) for address verification',
+    id: 'ssn_card',
+    name: 'Social Security Card',
+    description: 'Clear photo of your Social Security card',
     icon: FileText,
-    required: false
+    required: true
   },
   {
-    id: 'bank_statement',
-    name: 'Bank Statement',
-    description: 'Recent bank statement for additional verification',
+    id: 'proof_of_address',
+    name: 'Proof of Address',
+    description: 'Recent utility bill, bank statement, or lease agreement (dated within last 3 months)',
     icon: FileText,
-    required: false
+    required: true
+  },
+  {
+    id: 'selfie_with_id',
+    name: 'Selfie with ID',
+    description: 'Take a selfie holding your driver\'s license next to your face',
+    icon: Camera,
+    required: true
   }
 ];
 
@@ -58,7 +65,14 @@ export function KYCUpload() {
   }, [user]);
 
   const handleFileUpload = async (documentType: string, file: File) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Please Sign Up First",
+        description: "You need to create an account before uploading documents. Click 'Sign In' to create your account.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
@@ -234,10 +248,17 @@ export function KYCUpload() {
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              To comply with financial regulations, we need to verify your identity. 
-              Please upload the following documents for review. All documents are 
-              securely encrypted and stored.
+              To comply with US financial regulations and the USA PATRIOT Act, we need to verify your identity. 
+              Please upload all required documents below. All documents are securely encrypted and stored with bank-grade security.
             </p>
+            {!user && (
+              <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                <p className="text-sm text-warning">
+                  <strong>Note:</strong> You need to sign up first before uploading documents. 
+                  Click "Sign In" at the top to create your account, then return here to complete your verification.
+                </p>
+              </div>
+            )}
 
             {profile?.kyc_status === 'approved' && (
               <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
@@ -374,19 +395,22 @@ export function KYCUpload() {
               <div className="space-y-2">
                 <h5 className="font-medium text-foreground">Photo Quality</h5>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Ensure good lighting</li>
-                  <li>Avoid glare and shadows</li>
-                  <li>Keep documents flat</li>
-                  <li>Include all corners and edges</li>
+                  <li>Ensure good lighting - natural light works best</li>
+                  <li>Avoid glare, shadows, and blurriness</li>
+                  <li>Keep documents flat on a dark surface</li>
+                  <li>Include all corners and edges in frame</li>
+                  <li>Make sure all text is clearly readable</li>
                 </ul>
               </div>
               <div className="space-y-2">
                 <h5 className="font-medium text-foreground">Document Requirements</h5>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Documents must be current and valid</li>
-                  <li>All text must be clearly readable</li>
-                  <li>No alterations or modifications</li>
-                  <li>Government-issued IDs preferred</li>
+                  <li>All documents must be current and valid</li>
+                  <li>Driver's License must not be expired</li>
+                  <li>SSN card must show full 9-digit number</li>
+                  <li>Proof of address dated within last 90 days</li>
+                  <li>Selfie must show your face and ID clearly</li>
+                  <li>No alterations or modifications allowed</li>
                 </ul>
               </div>
             </div>

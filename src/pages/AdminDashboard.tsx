@@ -62,6 +62,14 @@ interface KYCDocument {
     email: string;
     first_name: string;
     last_name: string;
+    phone?: string;
+    date_of_birth?: string;
+    ssn_last_4?: string;
+    address_line_1?: string;
+    address_line_2?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
   };
 }
 
@@ -147,12 +155,12 @@ export default function AdminDashboard() {
       
       if (error) throw error;
       
-      // Get user profiles for KYC documents
+      // Get full user profiles for KYC documents including all signup data
       if (data && data.length > 0) {
         const userIds = [...new Set(data.map(d => d.user_id))];
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('user_id, email, first_name, last_name')
+          .select('*')
           .in('user_id', userIds);
         
         const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
@@ -315,9 +323,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const updateKYCStatus = async (docId: string, status: 'approved' | 'rejected') => {
+  const updateKYCStatus = async (docId: string, status: 'approved' | 'rejected', customNotes?: string) => {
     try {
-      const notes = adminNotes[docId];
+      const notes = customNotes || adminNotes[docId];
 
       const { error } = await supabase
         .from('kyc_documents')
@@ -772,64 +780,190 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>KYC Document Review</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Review and approve user verification documents. All user signup information is included.
+                </p>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {kycDocuments
-                    .filter(doc => doc.status === 'pending')
-                    .map((doc) => (
-                      <div key={doc.id} className="border rounded-lg p-6 space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
-                              <h4 className="font-medium">
-                                {doc.profiles?.first_name} {doc.profiles?.last_name}
-                              </h4>
-                              <Badge variant="outline">
-                                {doc.document_type}
+                <div className="space-y-8">
+                  {/* Group documents by user */}
+                  {(() => {
+                    const pendingDocs = kycDocuments.filter(doc => doc.status === 'pending');
+                    const userGroups = pendingDocs.reduce((acc, doc) => {
+                      const userId = doc.user_id;
+                      if (!acc[userId]) {
+                        acc[userId] = [];
+                      }
+                      acc[userId].push(doc);
+                      return acc;
+                    }, {} as Record<string, typeof kycDocuments>);
+
+                    return Object.entries(userGroups).map(([userId, userDocs]) => {
+                      const userProfile = userDocs[0]?.profiles;
+                      return (
+                        <div key={userId} className="border-2 rounded-lg p-6 space-y-4 bg-card">
+                          {/* User Header */}
+                          <div className="border-b pb-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-xl font-semibold">
+                                  {userProfile?.first_name} {userProfile?.last_name}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {userDocs.length} document{userDocs.length !== 1 ? 's' : ''} pending review
+                                </p>
+                              </div>
+                              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                                Pending Review
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground">{doc.profiles?.email}</p>
-                            <p className="text-sm text-muted-foreground">
-                              Uploaded: {formatDate(doc.created_at)}
-                            </p>
-                            <p className="text-sm font-medium">{doc.file_name}</p>
+                            
+                            {/* User Profile Information */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4 text-sm bg-muted/30 p-4 rounded-lg">
+                              <div>
+                                <span className="font-medium text-muted-foreground">Email:</span>
+                                <p className="text-foreground">{userProfile?.email}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-muted-foreground">Phone:</span>
+                                <p className="text-foreground">{userProfile?.phone || 'Not provided'}</p>
+                              </div>
+                              {userProfile?.date_of_birth && (
+                                <div>
+                                  <span className="font-medium text-muted-foreground">Date of Birth:</span>
+                                  <p className="text-foreground">{new Date(userProfile.date_of_birth).toLocaleDateString()}</p>
+                                </div>
+                              )}
+                              {userProfile?.ssn_last_4 && (
+                                <div>
+                                  <span className="font-medium text-muted-foreground">SSN (Last 4):</span>
+                                  <p className="text-foreground">***-**-{userProfile.ssn_last_4}</p>
+                                </div>
+                              )}
+                              {userProfile?.address_line_1 && (
+                                <div className="md:col-span-2 lg:col-span-3">
+                                  <span className="font-medium text-muted-foreground">Address:</span>
+                                  <p className="text-foreground">
+                                    {userProfile.address_line_1}
+                                    {userProfile.address_line_2 && `, ${userProfile.address_line_2}`}
+                                    <br />
+                                    {userProfile.city}, {userProfile.state} {userProfile.zip_code}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <Badge variant="outline" className={getStatusColor(doc.status)}>
-                            {doc.status}
-                          </Badge>
-                        </div>
 
-                        <div className="space-y-2">
-                          <Textarea
-                            placeholder="Add review notes..."
-                            value={adminNotes[doc.id] || ''}
-                            onChange={(e) => setAdminNotes(prev => ({ 
-                              ...prev, 
-                              [doc.id]: e.target.value 
-                            }))}
-                            rows={2}
-                          />
-                        </div>
+                          {/* User's Documents */}
+                          <div className="space-y-4">
+                            {userDocs.map((doc) => (
+                              <div key={doc.id} className="border rounded-lg p-4 space-y-3 bg-background">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <FileText className="w-4 h-4 text-primary" />
+                                      <span className="font-medium">
+                                        {doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                      </span>
+                                      <Badge variant="outline" className="text-xs">
+                                        {doc.status}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">{doc.file_name}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Uploaded: {formatDate(doc.created_at)}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
+                                      try {
+                                        const { data, error } = await supabase.storage
+                                          .from('kyc-documents')
+                                          .download(doc.file_path);
+                                        
+                                        if (error) throw error;
+                                        
+                                        const url = URL.createObjectURL(data);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = doc.file_name;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                        URL.revokeObjectURL(url);
+                                        
+                                        toast({
+                                          title: "Download Started",
+                                          description: "Document is being downloaded"
+                                        });
+                                      } catch (error: any) {
+                                        toast({
+                                          title: "Download Failed",
+                                          description: error.message,
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    Download
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
 
-                        <div className="flex space-x-2">
-                          <Button
-                            onClick={() => updateKYCStatus(doc.id, 'approved')}
-                            className="bg-success hover:bg-success/90"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Approve
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() => updateKYCStatus(doc.id, 'rejected')}
-                          >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Reject
-                          </Button>
+                          {/* Review Actions for All User's Documents */}
+                          <div className="border-t pt-4 space-y-3">
+                            <Textarea
+                              placeholder="Add review notes for this user..."
+                              value={adminNotes[userId] || ''}
+                              onChange={(e) => setAdminNotes(prev => ({ 
+                                ...prev, 
+                                [userId]: e.target.value 
+                              }))}
+                              rows={3}
+                            />
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                onClick={async () => {
+                                  // Approve all user's documents
+                                  for (const doc of userDocs) {
+                                    await updateKYCStatus(doc.id, 'approved', adminNotes[userId]);
+                                  }
+                                }}
+                                className="bg-success hover:bg-success/90"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Approve All Documents
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                onClick={async () => {
+                                  // Reject all user's documents
+                                  for (const doc of userDocs) {
+                                    await updateKYCStatus(doc.id, 'rejected', adminNotes[userId]);
+                                  }
+                                }}
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Reject All Documents
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    });
+                  })()}
+
+                  {kycDocuments.filter(doc => doc.status === 'pending').length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No pending KYC documents to review</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
