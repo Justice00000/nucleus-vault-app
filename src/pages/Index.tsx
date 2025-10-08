@@ -120,7 +120,7 @@ const Index = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="px-8 py-4" asChild>
-                <a href="/auth" className="flex items-center space-x-2">
+                <a href="/kyc" className="flex items-center space-x-2">
                   <span>Open Your Account</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
@@ -199,7 +199,7 @@ const Index = () => {
               </div>
 
               <Button size="lg" asChild>
-                <a href="/auth" className="flex items-center space-x-2">
+                <a href="/kyc" className="flex items-center space-x-2">
                   <span>Get Started Today</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
@@ -257,7 +257,7 @@ const Index = () => {
               className="px-8 py-4" 
               asChild
             >
-              <a href="/auth" className="flex items-center space-x-2">
+              <a href="/kyc" className="flex items-center space-x-2">
                 <span>Open Your Account</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
