@@ -183,9 +183,17 @@ export default function AdminDashboard() {
     try {
       console.log('Attempting to update user:', userId, 'to status:', status);
       
+      // Update both status and kyc_status when approving
+      const updateData: any = { status };
+      if (status === 'approved') {
+        updateData.kyc_status = 'approved';
+      } else if (status === 'declined') {
+        updateData.kyc_status = 'rejected';
+      }
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update({ status })
+        .update(updateData)
         .eq('user_id', userId)
         .select();
 
@@ -197,21 +205,32 @@ export default function AdminDashboard() {
       const userProfile = data?.[0];
       if (userProfile?.email) {
         try {
-          await supabase.functions.invoke('send-admin-notification', {
-            body: {
-              user_email: userProfile.email,
-              subject: `Account Status Update - ${status.charAt(0).toUpperCase() + status.slice(1)}`,
-              message: `Your account status has been updated to "${status}". ${
-                status === 'approved' 
-                  ? 'You can now access all banking features.' 
-                  : status === 'declined'
+          // Use the KYC notification function for approved accounts
+          if (status === 'approved') {
+            await supabase.functions.invoke('send-kyc-notification', {
+              body: {
+                user_email: userProfile.email,
+                user_name: `${userProfile.first_name} ${userProfile.last_name}`,
+                status: 'approved',
+                message: 'Congratulations! Your account and documents have been approved. You can now log in and access all banking features.'
+              }
+            });
+          } else {
+            // For declined/deactivated, use the admin notification function
+            await supabase.functions.invoke('send-admin-notification', {
+              body: {
+                user_email: userProfile.email,
+                subject: `Account Status Update - ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+                message: `Your account status has been updated to "${status}". ${
+                  status === 'declined'
                   ? 'Please contact support for more information.'
                   : 'Your account has been temporarily deactivated.'
-              }`,
-              action_type: 'user_status',
-              details: { status, updated_by: profile?.email }
-            }
-          });
+                }`,
+                action_type: 'user_status',
+                details: { status, updated_by: profile?.email }
+              }
+            });
+          }
         } catch (emailError) {
           console.error('Failed to send email notification:', emailError);
         }
@@ -219,7 +238,7 @@ export default function AdminDashboard() {
 
       toast({
         title: "User Status Updated",
-        description: `User status changed to ${status}`
+        description: `User status changed to ${status}. ${status === 'approved' ? 'Email notification sent.' : ''}`
       });
 
       fetchUsers();
