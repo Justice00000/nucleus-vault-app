@@ -76,39 +76,6 @@ export default function KYCSubmission() {
     }
   };
 
-  // Show pending review message if documents are submitted (only for logged in users)
-  if (user && profile?.kyc_status === 'pending') {
-    return (
-      <div className="min-h-screen bg-fintech-bg flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <div className="mx-auto w-16 h-16 bg-warning rounded-full flex items-center justify-center mb-4">
-              <Clock className="w-8 h-8 text-warning-foreground" />
-            </div>
-            <CardTitle className="text-xl">Documents Under Review</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Thank you for submitting your documents! Your KYC verification is currently being reviewed by our team. 
-              You'll receive an email notification once your documents are approved and you can access your account.
-            </p>
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="text-sm font-medium">What happens next?</p>
-              <ul className="text-sm text-muted-foreground mt-2 space-y-1 text-left">
-                <li>• Our team reviews your documents (usually within 24-48 hours)</li>
-                <li>• You'll receive an email with the verification status</li>
-                <li>• Once approved, you can access your account</li>
-              </ul>
-            </div>
-            <Button variant="outline" onClick={signOut} className="w-full mt-4">
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   // Show rejected message (only for logged in users)
   if (user && profile?.kyc_status === 'rejected') {
     return (
