@@ -281,7 +281,7 @@ export default function KYCSubmission() {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isSigningUp}>
-                  {isSigningUp ? 'Creating Account...' : 'Create Account & Continue to Document Upload'}
+                  {isSigningUp ? 'Creating Account...' : 'Next'}
                 </Button>
               </form>
             </CardContent>

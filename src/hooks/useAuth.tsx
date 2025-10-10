@@ -86,14 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
-    const redirectUrl = `${window.location.origin}/kyc`;
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
-        data: userData
+        data: userData,
+        emailRedirectTo: undefined // Skip email verification
       }
     });
     

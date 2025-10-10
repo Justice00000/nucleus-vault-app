@@ -781,15 +781,15 @@ export default function AdminDashboard() {
               <CardHeader>
                 <CardTitle>KYC Document Review</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Review and approve user verification documents. All user signup information is included.
+                  Review and approve user verification documents. All user signup information is included. You can change status even after approval.
                 </p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-8">
                   {/* Group documents by user */}
                   {(() => {
-                    const pendingDocs = kycDocuments.filter(doc => doc.status === 'pending');
-                    const userGroups = pendingDocs.reduce((acc, doc) => {
+                    const allDocs = kycDocuments; // Show all documents, not just pending
+                    const userGroups = allDocs.reduce((acc, doc) => {
                       const userId = doc.user_id;
                       if (!acc[userId]) {
                         acc[userId] = [];
@@ -800,6 +800,10 @@ export default function AdminDashboard() {
 
                     return Object.entries(userGroups).map(([userId, userDocs]) => {
                       const userProfile = userDocs[0]?.profiles;
+                      const hasPending = userDocs.some(doc => doc.status === 'pending');
+                      const hasApproved = userDocs.some(doc => doc.status === 'approved');
+                      const hasRejected = userDocs.some(doc => doc.status === 'rejected');
+                      
                       return (
                         <div key={userId} className="border-2 rounded-lg p-6 space-y-4 bg-card">
                           {/* User Header */}
@@ -810,12 +814,27 @@ export default function AdminDashboard() {
                                   {userProfile?.first_name} {userProfile?.last_name}
                                 </h3>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  {userDocs.length} document{userDocs.length !== 1 ? 's' : ''} pending review
+                                  {userDocs.length} document{userDocs.length !== 1 ? 's' : ''} • 
+                                  {hasPending && ' Pending'}{hasApproved && ' Approved'}{hasRejected && ' Rejected'}
                                 </p>
                               </div>
-                              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
-                                Pending Review
-                              </Badge>
+                              <div className="flex gap-2">
+                                {hasPending && (
+                                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                                    Pending
+                                  </Badge>
+                                )}
+                                {hasApproved && (
+                                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                                    Approved
+                                  </Badge>
+                                )}
+                                {hasRejected && (
+                                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                                    Rejected
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                             
                             {/* User Profile Information */}
@@ -937,7 +956,40 @@ export default function AdminDashboard() {
                                 className="bg-success hover:bg-success/90"
                               >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                Approve All Documents
+                                Approve All
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={async () => {
+                                  // Set all user's documents to pending
+                                  for (const doc of userDocs) {
+                                    const { error } = await supabase
+                                      .from('kyc_documents')
+                                      .update({ 
+                                        status: 'pending',
+                                        notes: adminNotes[userId] || 'Status changed to pending for re-review',
+                                        reviewed_by: user!.id,
+                                        reviewed_at: new Date().toISOString()
+                                      })
+                                      .eq('id', doc.id);
+                                    
+                                    if (!error) {
+                                      // Update profile status to pending
+                                      await supabase
+                                        .from('profiles')
+                                        .update({ kyc_status: 'pending' })
+                                        .eq('user_id', doc.user_id);
+                                    }
+                                  }
+                                  toast({
+                                    title: "Status Updated",
+                                    description: "All documents set to pending for re-review"
+                                  });
+                                  fetchKYCDocuments();
+                                }}
+                              >
+                                <Clock className="w-4 h-4 mr-2" />
+                                Set to Pending
                               </Button>
                               <Button
                                 variant="destructive"
@@ -949,7 +1001,7 @@ export default function AdminDashboard() {
                                 }}
                               >
                                 <XCircle className="w-4 h-4 mr-2" />
-                                Reject All Documents
+                                Reject All
                               </Button>
                             </div>
                           </div>
@@ -958,10 +1010,10 @@ export default function AdminDashboard() {
                     });
                   })()}
 
-                  {kycDocuments.filter(doc => doc.status === 'pending').length === 0 && (
+                  {kycDocuments.length === 0 && (
                     <div className="text-center py-12 text-muted-foreground">
                       <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No pending KYC documents to review</p>
+                      <p>No KYC documents to review</p>
                     </div>
                   )}
                 </div>
