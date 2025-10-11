@@ -23,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-    const FROM = Deno.env.get("EMAIL_FROM") || "FinTech Pro <onboarding@resend.dev>";
+    const FROM = Deno.env.get("EMAIL_FROM") || "Community Reserve <onboarding@resend.dev>";
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -133,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
             <!-- Header -->
             <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 32px 24px; text-align: center;">
               <h1 style="margin: 0; color: white; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                ${statusInfo.icon} FinTech Pro
+                ${statusInfo.icon} Community Reserve
               </h1>
               <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">
                 Your trusted banking partner
@@ -176,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
                       Important Information
                     </p>
                     <p style="margin: 0; font-size: 14px; color: #3730a3; line-height: 1.4;">
-                      This is an automated notification from FinTech Pro. Please log in to your account to view the complete details and manage your banking preferences.
+                      This is an automated notification from Community Reserve. Please log in to your account to view the complete details and manage your banking preferences.
                     </p>
                   </div>
                 </div>
@@ -186,7 +186,7 @@ const handler = async (req: Request): Promise<Response> => {
             <!-- Footer -->
             <div style="background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 12px;">
-                © 2024 FinTech Pro. All rights reserved.
+                © 2024 Community Reserve. All rights reserved.
               </p>
               <p style="margin: 0; color: #9ca3af; font-size: 11px;">
                 This email was sent to ${user_email}. If you have questions, please contact our support team.

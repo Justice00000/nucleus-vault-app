@@ -179,7 +179,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const updateUserStatus = async (userId: string, status: 'approved' | 'declined' | 'deactivated') => {
+  const updateUserStatus = async (userId: string, status: 'approved' | 'declined' | 'deactivated' | 'pending') => {
     try {
       console.log('Attempting to update user:', userId, 'to status:', status);
       
@@ -189,6 +189,8 @@ export default function AdminDashboard() {
         updateData.kyc_status = 'approved';
       } else if (status === 'declined') {
         updateData.kyc_status = 'rejected';
+      } else if (status === 'pending') {
+        updateData.kyc_status = 'pending';
       }
       
       const { data, error } = await supabase
