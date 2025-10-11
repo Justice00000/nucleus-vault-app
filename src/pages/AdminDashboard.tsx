@@ -194,7 +194,7 @@ export default function AdminDashboard() {
       const { data, error } = await supabase
         .from('profiles')
         .update(updateData)
-        .eq('user_id', userId)
+        .eq('id', userId)
         .select();
 
       console.log('Update result:', { data, error });
