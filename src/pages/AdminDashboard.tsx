@@ -673,24 +673,35 @@ export default function AdminDashboard() {
                               KYC: {user.kyc_status}
                             </p>
                           </div>
-                          {user.status === 'pending' && (
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                onClick={() => updateUserStatus(user.id, 'approved')}
-                                className="bg-success hover:bg-success/90"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => updateUserStatus(user.id, 'declined')}
-                              >
-                                <XCircle className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          )}
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              onClick={() => updateUserStatus(user.id, 'approved')}
+                              className="bg-success hover:bg-success/90"
+                              disabled={user.status === 'approved'}
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateUserStatus(user.id, 'pending')}
+                              disabled={user.status === 'pending'}
+                            >
+                              <Clock className="w-4 h-4 mr-1" />
+                              Pending
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => updateUserStatus(user.id, 'declined')}
+                              disabled={user.status === 'declined'}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Decline
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
