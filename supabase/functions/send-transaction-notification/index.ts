@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "npm:resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const FROM = Deno.env.get("EMAIL_FROM") || "Community Reserve <onboarding@resend.dev>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -139,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email using Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: "Community Reserve <notifications@resend.dev>",
+      from: FROM,
       to: [user_email],
       subject: subject,
       html: `
@@ -193,19 +194,32 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Email sent successfully:", emailData);
     }
 
-    // Log notification in database
-    const { error: notificationError } = await supabase
-      .from("notifications")
-      .insert({
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        type: "transaction",
-        title: subject,
-        message: `${typeText} of ${formattedAmount} - Status: ${status}`,
-        email_sent: !emailError,
-      });
+    // Log notification in database, linked to the user if we can find them by email
+    const { data: profileRecord, error: profileLookupError } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("email", user_email)
+      .maybeSingle();
 
-    if (notificationError) {
-      console.error("Error logging notification:", notificationError);
+    if (profileLookupError) {
+      console.error("Error looking up user by email for notification:", profileLookupError);
+    }
+
+    if (profileRecord?.user_id) {
+      const { error: notificationError } = await supabase
+        .from("notifications")
+        .insert({
+          user_id: profileRecord.user_id,
+          type: "transaction",
+          title: subject,
+          message: `${typeText} of ${formattedAmount} - Status: ${status}`,
+          email_sent: !emailError,
+        });
+      if (notificationError) {
+        console.error("Error logging notification:", notificationError);
+      }
+    } else {
+      console.log("Skipping notification insert; user not found for email:", user_email);
     }
 
     return new Response(

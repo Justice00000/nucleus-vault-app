@@ -23,6 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    const FROM = Deno.env.get("EMAIL_FROM") || "FinTech Pro <onboarding@resend.dev>";
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -115,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email using Resend
     const emailResponse = await resend.emails.send({
-      from: "FinTech Pro <onboarding@resend.dev>",
+      from: FROM,
       to: [user_email],
       subject: subject,
       html: `
@@ -205,20 +206,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Email sent successfully:", emailResponse.data);
 
-    // Also create a notification record in the database
-    const { error: notificationError } = await supabaseClient
-      .from("notifications")
-      .insert([{
-        user_id: null, // We'll need to get user_id from email if needed
-        type: action_type,
-        title: subject,
-        message: message,
-        is_read: false,
-        email_sent: true
-      }]);
+    // Also create a notification record in the database, linked to the user if we can find them by email
+    const { data: profileRecord, error: profileLookupError } = await supabaseClient
+      .from("profiles")
+      .select("user_id")
+      .eq("email", user_email)
+      .maybeSingle();
 
-    if (notificationError) {
-      console.error("Error creating notification record:", notificationError);
+    if (profileLookupError) {
+      console.error("Error looking up user by email for notification:", profileLookupError);
+    }
+
+    if (profileRecord?.user_id) {
+      const { error: notificationError } = await supabaseClient
+        .from("notifications")
+        .insert([{
+          user_id: profileRecord.user_id,
+          type: action_type,
+          title: subject,
+          message: message,
+          is_read: false,
+          email_sent: true
+        }]);
+      if (notificationError) {
+        console.error("Error creating notification record:", notificationError);
+      }
+    } else {
+      console.log("Skipping notification insert; user not found for email:", user_email);
     }
 
     return new Response(
