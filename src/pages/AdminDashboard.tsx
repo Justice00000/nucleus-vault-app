@@ -28,6 +28,7 @@ import {
 
 interface User {
   id: string;
+  user_id: string;
   email: string;
   first_name: string;
   last_name: string;
@@ -287,11 +288,23 @@ export default function AdminDashboard() {
 
     setIsFunding(true);
     try {
-      // Get the user's account
+      // Get the selected user's profile to find their user_id
+      const selectedUser = users.find(u => u.id === selectedUserToFund);
+      if (!selectedUser) {
+        toast({
+          title: "User Not Found",
+          description: "Selected user not found",
+          variant: "destructive"
+        });
+        setIsFunding(false);
+        return;
+      }
+
+      // Get the user's account using their user_id
       const { data: account, error: accountError } = await supabase
         .from('accounts')
         .select('id')
-        .eq('user_id', selectedUserToFund)
+        .eq('user_id', selectedUser.user_id)
         .maybeSingle();
 
       if (accountError) {
@@ -314,7 +327,7 @@ export default function AdminDashboard() {
         .from('transactions')
         .insert({
           account_id: account.id,
-          user_id: selectedUserToFund,
+          user_id: selectedUser.user_id,
           type: 'deposit',
           amount: amount,
           status: 'approved',
@@ -331,7 +344,7 @@ export default function AdminDashboard() {
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('email, first_name, last_name')
-        .eq('user_id', selectedUserToFund)
+        .eq('id', selectedUserToFund)
         .single();
 
       // Send notification email
