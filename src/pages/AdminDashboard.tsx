@@ -292,9 +292,22 @@ export default function AdminDashboard() {
         .from('accounts')
         .select('id')
         .eq('user_id', selectedUserToFund)
-        .single();
+        .maybeSingle();
 
-      if (accountError) throw accountError;
+      if (accountError) {
+        console.error('Account lookup error:', accountError);
+        throw accountError;
+      }
+
+      if (!account) {
+        toast({
+          title: "Account Not Found",
+          description: "This user does not have an account yet",
+          variant: "destructive"
+        });
+        setIsFunding(false);
+        return;
+      }
 
       // Create an admin deposit transaction with approved status
       const { error: transactionError } = await supabase
