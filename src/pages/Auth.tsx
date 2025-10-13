@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Building2, Shield, Users } from 'lucide-react';
 
 const US_STATES = [
@@ -21,6 +23,8 @@ export default function Auth() {
   const { user, signIn, signUp, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   
   const [loginForm, setLoginForm] = useState({
     email: '',
@@ -96,6 +100,32 @@ export default function Auth() {
     setIsSubmitting(false);
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setIsSubmitting(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
+      });
+      setShowResetPassword(false);
+      setResetEmail('');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-fintech-bg to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
@@ -132,12 +162,14 @@ export default function Auth() {
               
               {/* Login Tab */}
               <TabsContent value="login" className="mt-6">
-                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                <CardDescription>
-                  Sign in to access your account
-                </CardDescription>
-                
-                <form onSubmit={handleLogin} className="space-y-4 mt-6">
+                {!showResetPassword ? (
+                  <>
+                    <CardTitle className="text-2xl">Welcome back</CardTitle>
+                    <CardDescription>
+                      Sign in to access your account
+                    </CardDescription>
+                    
+                    <form onSubmit={handleLogin} className="space-y-4 mt-6">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email address</Label>
                     <Input
@@ -177,14 +209,67 @@ export default function Auth() {
                     </div>
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Signing in...' : 'Sign in'}
-                  </Button>
-                </form>
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Signing in...' : 'Sign in'}
+                      </Button>
+
+                      <div className="text-center">
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-sm text-primary"
+                          onClick={() => setShowResetPassword(true)}
+                        >
+                          Forgot your password?
+                        </Button>
+                      </div>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <CardTitle className="text-2xl">Reset Password</CardTitle>
+                    <CardDescription>
+                      Enter your email and we'll send you a reset link
+                    </CardDescription>
+                    
+                    <form onSubmit={handlePasswordReset} className="space-y-4 mt-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="resetEmail">Email address</Label>
+                        <Input
+                          id="resetEmail"
+                          type="email"
+                          placeholder="Enter your email"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+                      </Button>
+
+                      <div className="text-center">
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-sm text-primary"
+                          onClick={() => setShowResetPassword(false)}
+                        >
+                          Back to sign in
+                        </Button>
+                      </div>
+                    </form>
+                  </>
+                )}
               </TabsContent>
               
               {/* Signup Tab */}

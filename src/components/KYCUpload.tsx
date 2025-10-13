@@ -31,25 +31,25 @@ const DOCUMENT_TYPES = [
     required: true
   },
   {
-    id: 'ssn_card',
-    name: 'Social Security Card',
-    description: 'Clear photo of your Social Security card',
+    id: 'passport',
+    name: 'Passport',
+    description: 'Clear photo of your passport identification page',
     icon: FileText,
-    required: true
+    required: false
   },
   {
-    id: 'proof_of_address',
-    name: 'Proof of Address',
-    description: 'Recent utility bill, bank statement, or lease agreement (dated within last 3 months)',
-    icon: FileText,
-    required: true
+    id: 'state_id_front',
+    name: 'State ID (Front)',
+    description: 'Clear photo of the front of your state-issued ID',
+    icon: CreditCard,
+    required: false
   },
   {
-    id: 'selfie_with_id',
-    name: 'Selfie with ID',
-    description: 'Take a selfie holding your driver\'s license next to your face',
-    icon: Camera,
-    required: true
+    id: 'state_id_back',
+    name: 'State ID (Back)',
+    description: 'Clear photo of the back of your state-issued ID',
+    icon: CreditCard,
+    required: false
   }
 ];
 

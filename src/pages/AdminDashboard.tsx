@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { 
@@ -19,7 +22,8 @@ import {
   Search,
   Eye,
   DollarSign,
-  AlertTriangle
+  AlertTriangle,
+  Wallet
 } from 'lucide-react';
 
 interface User {
@@ -81,6 +85,13 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [adminNotes, setAdminNotes] = useState<{ [key: string]: string }>({});
+  
+  // Fund user states
+  const [showFundDialog, setShowFundDialog] = useState(false);
+  const [selectedUserToFund, setSelectedUserToFund] = useState('');
+  const [fundAmount, setFundAmount] = useState('');
+  const [fundDescription, setFundDescription] = useState('');
+  const [isFunding, setIsFunding] = useState(false);
 
   useEffect(() => {
     if (user && profile?.is_admin) {
@@ -251,6 +262,103 @@ export default function AdminDashboard() {
         description: error.message,
         variant: "destructive"
       });
+    }
+  };
+
+  const handleFundUser = async () => {
+    if (!selectedUserToFund || !fundAmount) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a user and enter an amount",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const amount = parseFloat(fundAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid amount greater than 0",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsFunding(true);
+    try {
+      // Get the user's account
+      const { data: account, error: accountError } = await supabase
+        .from('accounts')
+        .select('id')
+        .eq('user_id', selectedUserToFund)
+        .single();
+
+      if (accountError) throw accountError;
+
+      // Create an admin deposit transaction with approved status
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          account_id: account.id,
+          user_id: selectedUserToFund,
+          type: 'deposit',
+          amount: amount,
+          status: 'approved',
+          description: fundDescription || 'Admin funding',
+          external_account_name: 'Admin Funding',
+          external_account_number: 'ADMIN',
+          processed_by: user!.id,
+          processed_at: new Date().toISOString()
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Get user profile for notification
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('email, first_name, last_name')
+        .eq('user_id', selectedUserToFund)
+        .single();
+
+      // Send notification email
+      if (userProfile) {
+        await supabase.functions.invoke('send-transaction-notification', {
+          body: {
+            user_email: userProfile.email,
+            user_name: `${userProfile.first_name} ${userProfile.last_name}`,
+            transaction_type: 'deposit',
+            amount: amount,
+            status: 'approved',
+            description: fundDescription || 'Admin funding',
+            account_number: 'N/A',
+            external_account: 'Admin Funding'
+          }
+        });
+      }
+
+      toast({
+        title: "Success",
+        description: `Successfully funded $${amount.toFixed(2)} to user account`
+      });
+
+      // Reset form and close dialog
+      setShowFundDialog(false);
+      setSelectedUserToFund('');
+      setFundAmount('');
+      setFundDescription('');
+      
+      // Refresh transactions
+      fetchTransactions();
+    } catch (error: any) {
+      console.error('Funding error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fund user account",
+        variant: "destructive"
+      });
+    } finally {
+      setIsFunding(false);
     }
   };
 
@@ -501,6 +609,78 @@ export default function AdminDashboard() {
               </p>
             </div>
             <div className="flex gap-2 sm:gap-4">
+              <Dialog open={showFundDialog} onOpenChange={setShowFundDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm">
+                    <Wallet className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Fund User</span>
+                    <span className="sm:hidden">Fund</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Fund User Account</DialogTitle>
+                    <DialogDescription>
+                      Add funds directly to a user's account
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="selectUser">Select User</Label>
+                      <Select value={selectedUserToFund} onValueChange={setSelectedUserToFund}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a user" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {users.filter(u => u.status === 'approved').map(u => (
+                            <SelectItem key={u.id} value={u.id}>
+                              {u.first_name} {u.last_name} ({u.email})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fundAmount">Amount (USD)</Label>
+                      <Input
+                        id="fundAmount"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        placeholder="0.00"
+                        value={fundAmount}
+                        onChange={(e) => setFundAmount(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fundDescription">Description (Optional)</Label>
+                      <Textarea
+                        id="fundDescription"
+                        placeholder="Reason for funding..."
+                        value={fundDescription}
+                        onChange={(e) => setFundDescription(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleFundUser}
+                        disabled={isFunding}
+                        className="flex-1"
+                      >
+                        {isFunding ? 'Processing...' : 'Fund Account'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowFundDialog(false)}
+                        disabled={isFunding}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard'}>
                 <span className="hidden sm:inline">User View</span>
                 <span className="sm:hidden">User</span>

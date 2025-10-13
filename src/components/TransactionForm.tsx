@@ -74,18 +74,32 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
 
       // For transfers, verify recipient account exists
       if (transactionType === 'transfer') {
+        const trimmedAccountNumber = formData.recipientAccountNumber.trim();
+        
+        if (!trimmedAccountNumber) {
+          toast({
+            title: "Invalid Account Number",
+            description: "Please enter a valid account number",
+            variant: "destructive"
+          });
+          return;
+        }
+
         const { data: recipientAccount, error: recipientError } = await supabase
           .from('accounts')
-          .select('id, user_id')
-          .eq('account_number', formData.recipientAccountNumber)
+          .select('id, user_id, account_number')
+          .eq('account_number', trimmedAccountNumber)
           .maybeSingle();
 
-        if (recipientError) throw recipientError;
+        if (recipientError) {
+          console.error('Recipient lookup error:', recipientError);
+          throw recipientError;
+        }
         
         if (!recipientAccount) {
           toast({
             title: "Invalid Account Number",
-            description: "The recipient account number does not exist",
+            description: "The recipient account number does not exist. Please verify and try again.",
             variant: "destructive"
           });
           return;
@@ -326,21 +340,6 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
                     placeholder="1234567890"
                     value={formData.externalAccountNumber}
                     onChange={(e) => setFormData(prev => ({ ...prev, externalAccountNumber: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="routingNumber">Routing Number</Label>
-                  <Input
-                    id="routingNumber"
-                    placeholder="123456789"
-                    maxLength={9}
-                    value={formData.externalRoutingNumber}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      externalRoutingNumber: e.target.value.replace(/\D/g, '') 
-                    }))}
                     required
                   />
                 </div>
