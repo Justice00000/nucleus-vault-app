@@ -301,18 +301,19 @@ export default function AdminDashboard() {
       }
 
       // Get the user's account using their user_id
-      const { data: account, error: accountError } = await supabase
+      const { data: accountsData, error: accountError } = await supabase
         .from('accounts')
-        .select('id')
+        .select('id, created_at')
         .eq('user_id', selectedUser.user_id)
-        .maybeSingle();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
       if (accountError) {
         console.error('Account lookup error:', accountError);
         throw accountError;
       }
 
-      if (!account) {
+      if (!accountsData || accountsData.length === 0) {
         toast({
           title: "Account Not Found",
           description: "This user does not have an account yet",
@@ -326,7 +327,7 @@ export default function AdminDashboard() {
       const { error: transactionError } = await supabase
         .from('transactions')
         .insert({
-          account_id: account.id,
+          account_id: accountsData[0].id,
           user_id: selectedUser.user_id,
           type: 'deposit',
           amount: amount,
@@ -411,9 +412,10 @@ export default function AdminDashboard() {
           // Get account details
           const { data: accountData } = await supabase
             .from('accounts')
-            .select('account_number')
+            .select('account_number, created_at')
             .eq('user_id', transaction.user_id)
-            .single();
+            .order('created_at', { ascending: false })
+            .limit(1);
 
           // Send transaction notification email
           await supabase.functions.invoke('send-transaction-notification', {
@@ -424,7 +426,7 @@ export default function AdminDashboard() {
               amount: Number(transaction.amount),
               status,
               description: transaction.description || notes,
-              account_number: accountData?.account_number,
+              account_number: accountData?.[0]?.account_number,
               external_account: transaction.external_account_number 
                 ? `${transaction.external_account_name || ''} (${transaction.external_account_number})`
                 : undefined,
