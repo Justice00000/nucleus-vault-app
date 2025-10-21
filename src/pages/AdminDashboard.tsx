@@ -63,6 +63,7 @@ interface KYCDocument {
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   profiles?: {
+    id: string;
     email: string;
     first_name: string;
     last_name: string;
@@ -292,7 +293,7 @@ export default function AdminDashboard() {
         .from('profiles')
         .select('user_id')
         .eq('id', selectedUserToFund)
-        .single();
+        .maybeSingle();
 
       if (profileError || !profileData) {
         toast({
@@ -352,7 +353,7 @@ export default function AdminDashboard() {
         .from('profiles')
         .select('email, first_name, last_name')
         .eq('id', selectedUserToFund)
-        .single();
+        .maybeSingle();
 
       // Send notification email
       if (userProfile) {
@@ -522,7 +523,7 @@ export default function AdminDashboard() {
           await supabase
             .from('profiles')
             .update({ kyc_status: 'approved' })
-            .eq('user_id', kycDoc.user_id);
+            .eq('id', kycDoc.profiles?.id as string);
         }
       }
 
@@ -532,7 +533,7 @@ export default function AdminDashboard() {
           await supabase
             .from('profiles')
             .update({ kyc_status: 'rejected' })
-            .eq('user_id', kycDoc.user_id);
+            .eq('id', kycDoc.profiles?.id as string);
         }
       }
 
@@ -1224,7 +1225,7 @@ export default function AdminDashboard() {
                                       await supabase
                                         .from('profiles')
                                         .update({ kyc_status: 'pending' })
-                                        .eq('user_id', doc.user_id);
+                                        .eq('id', doc.profiles?.id as string);
                                     }
                                   }
                                   toast({
