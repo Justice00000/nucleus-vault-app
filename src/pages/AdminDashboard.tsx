@@ -28,7 +28,6 @@ import {
 
 interface User {
   id: string;
-  user_id: string;
   email: string;
   first_name: string;
   last_name: string;
@@ -288,23 +287,30 @@ export default function AdminDashboard() {
 
     setIsFunding(true);
     try {
-      // Get the selected user's profile to find their user_id
-      const selectedUser = users.find(u => u.id === selectedUserToFund);
-      if (!selectedUser) {
+      // Get the selected user's user_id from profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('id', selectedUserToFund)
+        .single();
+
+      if (profileError || !profileData) {
         toast({
           title: "User Not Found",
-          description: "Selected user not found",
+          description: "Selected user profile not found",
           variant: "destructive"
         });
         setIsFunding(false);
         return;
       }
 
+      const userIdForAccount = profileData.user_id;
+
       // Get the user's account using their user_id
       const { data: accountsData, error: accountError } = await supabase
         .from('accounts')
         .select('id, created_at')
-        .eq('user_id', selectedUser.user_id)
+        .eq('user_id', userIdForAccount)
         .order('created_at', { ascending: false })
         .limit(1);
 
@@ -328,7 +334,7 @@ export default function AdminDashboard() {
         .from('transactions')
         .insert({
           account_id: accountsData[0].id,
-          user_id: selectedUser.user_id,
+          user_id: userIdForAccount,
           type: 'deposit',
           amount: amount,
           status: 'approved',
