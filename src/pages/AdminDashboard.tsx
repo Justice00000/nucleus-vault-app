@@ -195,6 +195,19 @@ export default function AdminDashboard() {
     try {
       console.log('Attempting to update user:', userId, 'to status:', status);
       
+      // First verify the user exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('profiles')
+        .select('id, user_id, email, first_name, last_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+      console.log('User lookup:', { existingUser, checkError });
+
+      if (checkError || !existingUser) {
+        throw new Error(`User not found with id: ${userId}`);
+      }
+      
       // Update both status and kyc_status when approving
       const updateData: any = { status };
       if (status === 'approved') {
@@ -209,11 +222,16 @@ export default function AdminDashboard() {
         .from('profiles')
         .update(updateData)
         .eq('id', userId)
-        .select();
+        .select()
+        .single();
 
       console.log('Update result:', { data, error });
 
       if (error) throw error;
+      
+      if (!data) {
+        throw new Error('Update succeeded but no data returned');
+      }
 
       // Send email notification
       const userProfile = data?.[0];
